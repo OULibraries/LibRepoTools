@@ -29,6 +29,7 @@
     <import resource="classpath*:**/dspaceManagerContext.xml"/>
     <import resource="classpath*:**/islandoraManagerContext.xml"/>
     <import resource="classpath*:**/ouHistoryDataContext.xml"/>
+    <import resource="classpath*:**/ouawsContext.xml"/>
     
     <bean id="plosDspaceServiceImpl" class="org.shareok.data.kernel.api.services.dspace.DspacePlosServiceImpl">
 
@@ -69,6 +70,8 @@
     <bean id="configServiceImpl" class="org.shareok.data.kernel.api.services.config.ConfigServiceImpl" />
     
     <bean id="passwordAuthenticationServiceImpl" class="org.shareok.data.kernel.api.services.user.PasswordAuthenticationServiceImpl" />
+    
+    <bean id="awsDissertationServiceImpl" class="org.shareok.data.kernel.api.services.ouaws.AwsDissertationServiceImpl" />
     
 </beans>
 

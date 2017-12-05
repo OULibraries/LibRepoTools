@@ -25,7 +25,7 @@ import org.shareok.data.datahandlers.exceptions.NotFoundPublisherException;
 import org.shareok.data.htmlrequest.HtmlParser;
 import org.shareok.data.documentProcessor.ExcelHandler;
 import org.shareok.data.documentProcessor.DocumentProcessorUtil;
-import org.shareok.data.dspacemanager.DspaceJournalDataUtil;
+import org.shareok.data.dspacemanager.DspaceDataUtil;
 import org.shareok.data.plosdata.PlosUtil.JournalType;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -190,7 +190,7 @@ public class PlosDoiDataImpl implements ExcelData, PlosDoiData {
     @Override
     public String getDspaceLoadingData(MultipartFile file){
         String filePath = null;
-        filePath = DspaceJournalDataUtil.saveUploadedData(file, "plos");
+        filePath = DspaceDataUtil.saveUploadedData(file, "plos");
         setOutputPath(DocumentProcessorUtil.getFileContainerPath(filePath)+File.separator+"output");
         try {
             getDspaceLoadingData(filePath);
@@ -232,7 +232,7 @@ public class PlosDoiDataImpl implements ExcelData, PlosDoiData {
     public String getDspaceJournalLoadingFilesByDoi(String[] dois, Date time) {
         String uploadPath = null;
         plosDataList.clear();
-        uploadPath = DspaceJournalDataUtil.getDspaceJournalUploadPath("plos", time);
+        uploadPath = DspaceDataUtil.getDspaceUploadPath("plos", time);
         setOutputPath(uploadPath+File.separator+"output_plos");
         for(String doi : dois){
             getDspaceJournalLoadingFilesBySingleDoi(doi);
@@ -371,7 +371,7 @@ public class PlosDoiDataImpl implements ExcelData, PlosDoiData {
             PlosUtil.createContentFile(articleOutputFolderPath+File.separator+"contents", doi.split("/")[1]+".pdf");
             plosData.exportXmlByDoiData(articleOutputFolderPath+File.separator+"dublin_core.xml");
             String outputFolderPath = DocumentProcessorUtil.getFileContainerPath(articleOutputFolderPath);
-            DspaceJournalDataUtil.packLoadingData(outputFolderPath, "plos");
+            DspaceDataUtil.packLoadingData(outputFolderPath, "plos");
         }
         catch(Exception ex){
             System.out.print("The data processing from doiData to plosData is wrong!\n");

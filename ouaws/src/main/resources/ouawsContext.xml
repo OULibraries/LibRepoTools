@@ -17,6 +17,10 @@
     
     <bean id="s3TiffProcessorThread" class="oulib.aws.s3.S3TiffProcessorThread" />
     
+    <bean id="dissertation" class="oulib.aws.s3.Dissertation" />
+    
+    <bean id="dissertationProcessor" class="oulib.aws.s3.DissertationProcessor" />
+    
     <bean id="s3Util" class="oulib.aws.s3.S3Util" />
     
 </beans>

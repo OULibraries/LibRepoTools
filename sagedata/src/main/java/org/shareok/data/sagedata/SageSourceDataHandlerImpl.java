@@ -44,7 +44,7 @@ import org.shareok.data.sagedata.exceptions.EmptyFilePathException;
 import org.shareok.data.config.ShareokdataManager;
 import org.shareok.data.datahandlers.DataHandlersUtil;
 import org.shareok.data.datahandlers.exceptions.NoHtmlComponentsFoundException;
-import org.shareok.data.dspacemanager.DspaceJournalDataUtil;
+import org.shareok.data.dspacemanager.DspaceDataUtil;
 import org.shareok.data.htmlrequest.HttpRequestHandler;
 import org.shareok.data.datahandlers.exceptions.NoFullTextAccessException;
 import org.springframework.beans.BeansException;
@@ -364,14 +364,14 @@ public class SageSourceDataHandlerImpl implements SageSourceDataHandler {
     public String getDspaceLoadingData(MultipartFile file){
         String filePath = null;
         try {
-            filePath = DspaceJournalDataUtil.saveUploadedData(file, "sage");
+            filePath = DspaceDataUtil.saveUploadedData(file, "sage");
             if(null != filePath){
                 setSourceFilePath(filePath);
                 setOutputFilePath(DocumentProcessorUtil.getFileContainerPath(filePath) + "output");
                 readSourceData();
                 processSourceData();
                 outputMetaData();
-                DspaceJournalDataUtil.packLoadingData(getOutputFilePath(), "sage");
+                DspaceDataUtil.packLoadingData(getOutputFilePath(), "sage");
             }            
         } catch (Exception ex) {
             Logger.getLogger(SageSourceDataHandlerImpl.class.getName()).log(Level.SEVERE, null, ex);
@@ -382,7 +382,7 @@ public class SageSourceDataHandlerImpl implements SageSourceDataHandler {
     @Override
     public String getDspaceJournalLoadingFilesByDoi(String[] dois, Date time) {
         String uploadPath = null;
-        uploadPath = DspaceJournalDataUtil.getDspaceJournalUploadPath("sage", time);
+        uploadPath = DspaceDataUtil.getDspaceUploadPath("sage", time);
         String outputPath = uploadPath+File.separator+"output_sage";
         File output = new File(outputPath);
         if(!output.exists()){
@@ -405,7 +405,7 @@ public class SageSourceDataHandlerImpl implements SageSourceDataHandler {
             }
         }
                 
-        DspaceJournalDataUtil.packLoadingData(outputPath, "sage");
+        DspaceDataUtil.packLoadingData(outputPath, "sage");
         try {
             FileUtils.deleteDirectory(new File(outputPath));
         } catch (IOException ex) {

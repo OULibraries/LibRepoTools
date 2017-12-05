@@ -33,10 +33,14 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -62,6 +66,11 @@ import org.apache.commons.imaging.formats.tiff.write.TiffImageWriterLossy;
 import org.apache.commons.imaging.formats.tiff.write.TiffOutputDirectory;
 import org.apache.commons.imaging.formats.tiff.write.TiffOutputField;
 import org.apache.commons.imaging.formats.tiff.write.TiffOutputSet;
+import org.apache.commons.lang3.StringUtils;
+import org.json.JSONObject;
+import oulib.aws.AwsUtil;
+import oulib.aws.exceptions.IncompleteFunctionArgumentsException;
+import oulib.aws.exceptions.InvalidS3ClientException;
 import oulib.aws.exceptions.InvalidS3CredentialsException;
 
 import oulib.aws.exceptions.NoMatchingTagInfoException;
@@ -593,18 +602,7 @@ public class S3Util {
      */
     public static AmazonS3 getS3AwsClient(){
         
-        AWSCredentials credentials = null;
-        try {
-            ProfileCredentialsProvider provider = new ProfileCredentialsProvider("default");
-            credentials = provider.getCredentials();   
-            if(null == credentials){
-                throw new InvalidS3CredentialsException("Invalid credentials with default approach!");
-            }
-        } catch (InvalidS3CredentialsException | AmazonClientException e) {
-            throw new AmazonClientException("Cannot load the credentials from the credential profiles file. " +
-                    "Please make sure that your credentials file is at the correct " +
-                    "location (/Users/zhao0677/.aws/credentials), and is in valid format.", e);
-        }
+        AWSCredentials credentials = AwsUtil.getAwsCredentials();
         
         AmazonS3 s3client = new AmazonS3Client(credentials);
         Region usEast = Region.getRegion(Regions.US_EAST_1);
@@ -629,5 +627,115 @@ public class S3Util {
             Region usEast = Region.getRegion(Regions.US_EAST_1);
             s3client.setRegion(usEast);
             return s3client;
+    }
+    
+    public static void downloadS3ObjectToFile(AmazonS3Client s3Client, String bucketName, String key, String targetFilePath) 
+            throws InvalidS3ClientException, IncompleteFunctionArgumentsException
+    {
+        InputStream in = null;
+        
+        if(null == s3Client){
+            throw new InvalidS3ClientException("The s3client is empty!");
+        }
+        
+        if(StringUtils.isBlank(key) || StringUtils.isBlank(bucketName) || StringUtils.isBlank(targetFilePath)){
+            throw new IncompleteFunctionArgumentsException("Some arguments are empty!");
+        }
+        
+        try{
+            S3Object object = s3Client.getObject(new GetObjectRequest(bucketName, key));
+            in = object.getObjectContent();
+            File targetFile = new File(targetFilePath);
+            
+            java.nio.file.Files.copy(in, targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
+        catch (AmazonServiceException ase) {
+            System.out.println("Caught an AmazonServiceException, which" +
+            		" means your request made it " +
+                    "to Amazon S3, but was rejected with an error response" +
+                    " for some reason.");
+            System.out.println("Error Message:    " + ase.getMessage());
+            System.out.println("HTTP Status Code: " + ase.getStatusCode());
+            System.out.println("AWS Error Code:   " + ase.getErrorCode());
+            System.out.println("Error Type:       " + ase.getErrorType());
+            System.out.println("Request ID:       " + ase.getRequestId());
+        } catch (AmazonClientException ace) {
+            System.out.println("Caught an AmazonClientException, which means"+
+            		" the client encountered " +
+                    "an internal error while trying to " +
+                    "communicate with S3, " +
+                    "such as not being able to access the network.");
+            System.out.println("Error Message: " + ace.getMessage());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            Logger.getLogger(S3Util.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            if(null != in){
+                try {
+                    in.close();
+                } catch(IOException ex){
+                    ex.printStackTrace();
+                }
+            }
+        }
+    }
+    
+    public static JSONObject parseS3ObjectToJson(AmazonS3Client s3Client, String bucketName, String key) 
+            throws InvalidS3ClientException, IncompleteFunctionArgumentsException
+    {
+        InputStream in = null;
+        
+        if(null == s3Client){
+            throw new InvalidS3ClientException("The s3client is empty!");
+        }
+        
+        if(StringUtils.isBlank(key) || StringUtils.isBlank(bucketName)){
+            throw new IncompleteFunctionArgumentsException("Some arguments are empty!");
+        }
+        
+        try{
+            S3Object object = s3Client.getObject(new GetObjectRequest(bucketName, key));
+            in = object.getObjectContent();
+            
+            StringBuilder sb = new StringBuilder();
+            String line;
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+            JSONObject json = new JSONObject(sb.toString());
+            
+            return json;
+        }
+        catch (AmazonServiceException ase) {
+            System.out.println("Caught an AmazonServiceException, which" +
+            		" means your request made it " +
+                    "to Amazon S3, but was rejected with an error response" +
+                    " for some reason.");
+            System.out.println("Error Message:    " + ase.getMessage());
+            System.out.println("HTTP Status Code: " + ase.getStatusCode());
+            System.out.println("AWS Error Code:   " + ase.getErrorCode());
+            System.out.println("Error Type:       " + ase.getErrorType());
+            System.out.println("Request ID:       " + ase.getRequestId());
+        } catch (AmazonClientException ace) {
+            System.out.println("Caught an AmazonClientException, which means"+
+            		" the client encountered " +
+                    "an internal error while trying to " +
+                    "communicate with S3, " +
+                    "such as not being able to access the network.");
+            System.out.println("Error Message: " + ace.getMessage());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            Logger.getLogger(S3Util.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            if(null != in){
+                try {
+                    in.close();
+                } catch(IOException ex){
+                    ex.printStackTrace();
+                }
+            }
+        }
+        return null;
     }
 }
