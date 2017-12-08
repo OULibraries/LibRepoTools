@@ -9,11 +9,13 @@ import com.amazonaws.AmazonClientException;
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.auth.EnvironmentVariableCredentialsProvider;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -130,14 +132,15 @@ public class AwsUtil {
         return credentials;
     }
     
-    public static AmazonS3Client getS3ClientByCredentialInfo(AWSCredentials credentials){
+    public static AmazonS3Client getS3ClientByCredentialInfo(){
 
         ClientConfiguration config = new ClientConfiguration();
         config.setConnectionTimeout(250000);
         config.setSocketTimeout(50000);     
-        AmazonS3Client s3Client = new AmazonS3Client(credentials, config);
-        Region usEast = Region.getRegion(Regions.US_EAST_1);
-        s3Client.setRegion(usEast);
+        AmazonS3Client s3Client = (AmazonS3Client) AmazonS3ClientBuilder.standard()
+                       .withCredentials(new EnvironmentVariableCredentialsProvider())
+                       .withRegion(Regions.US_EAST_1)
+                       .build();
         
         return s3Client;
     }

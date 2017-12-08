@@ -16,8 +16,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -43,8 +41,7 @@ public class DissertationProcessor {
     private Dissertation[] dissertations;
 
     public DissertationProcessor() {
-        AWSCredentials credentials = AwsUtil.getAwsCredentials();
-        AmazonS3Client client = AwsUtil.getS3ClientByCredentialInfo(credentials);
+        AmazonS3Client client = AwsUtil.getS3ClientByCredentialInfo();
         setS3Client(client);
     }
 
