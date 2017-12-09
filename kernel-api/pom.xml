@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.shareok.data</groupId>
         <artifactId>shareokdata</artifactId>
-        <version>1.1.0-SNAPSHOT</version>
+        <version>1.1.1-SNAPSHOT</version>
     </parent>
     <artifactId>kernel-api</artifactId>
     <packaging>jar</packaging>
@@ -95,14 +95,14 @@
         <dependency>
             <groupId>org.shareok.data</groupId>
             <artifactId>sagedata</artifactId>
-            <version>1.1.0-SNAPSHOT</version>
+            <version>1.1.1-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
         
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>plosdata</artifactId>
-            <version>1.1.0-SNAPSHOT</version>
+            <version>1.1.1-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -118,7 +118,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>dspaceManager</artifactId>
-            <version>1.1.0-SNAPSHOT</version>
+            <version>1.1.1-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -139,7 +139,7 @@
         <dependency>
             <groupId>oulib.aws</groupId>
             <artifactId>ouaws</artifactId>
-            <version>1.1.0-SNAPSHOT</version>
+            <version>1.1.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>

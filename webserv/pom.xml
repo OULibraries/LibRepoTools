@@ -4,12 +4,12 @@
     <parent>
     <artifactId>shareokdata</artifactId>
     <groupId>org.shareok.data</groupId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.1.1-SNAPSHOT</version>
   </parent>
 
     <groupId>org.shareok.data</groupId>
     <artifactId>webserv</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.1.1-SNAPSHOT</version>
     <packaging>war</packaging>
 
     <name>webserv</name>
@@ -53,7 +53,7 @@
         <dependency>
             <groupId>org.shareok.data</groupId>
             <artifactId>kernel-api</artifactId>
-            <version>1.1.0-SNAPSHOT</version>
+            <version>1.1.1-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
         
