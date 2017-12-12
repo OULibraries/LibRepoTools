@@ -1049,6 +1049,7 @@ public class DspaceApiHandlerImpl implements DspaceApiHandler{
         this.dspaceApiUrl = dspaceApiUrl;
         BufferedWriter loggingForUserWriter = null;
         BufferedWriter mapWriter = null;
+        String urlBase = dspaceApiUrl.split("rest")[0];
         String message;
         
         if(DocumentProcessorUtil.isEmptyString(token)){
@@ -1100,7 +1101,8 @@ public class DspaceApiHandlerImpl implements DspaceApiHandler{
                 mainLoop:
                 for(File file : safFile.listFiles()){
                     if(null != file && file.isDirectory()){
-                        
+                        String newItemHandle = "";
+                        String itemName = file.getName();
                         File[] fileList = file.listFiles();
                         boolean containsContentsFile = false;                        
                         boolean containsMetadataFile = false;
@@ -1138,8 +1140,7 @@ public class DspaceApiHandlerImpl implements DspaceApiHandler{
                             }
                         }
                         if(containsContentsFile == true && containsMetadataFile == true){
-                            String newItemId;
-                            String newItemHandle;
+                            String newItemId;                            
                             // Create the new item now:
                             try{
                                 String collectionId = getObjectIdByHandler(collectionHandle, dspaceApiUrl);
@@ -1273,6 +1274,7 @@ public class DspaceApiHandlerImpl implements DspaceApiHandler{
                             loggingForUserWriter.write(message);
                             //throw new SafPackageMissingFileException("Saf package at " + safPath + " either the contents file or the metadata files are missing!");
                         }
+                        loggingForUserWriter.write("url__" + itemName+"=" + urlBase + newItemHandle + "\n");                        
                         loggingForUserWriter.write("Item with doi:"+doi+" has been processed.\n\n==================================================\n\n");
                     }
                 }

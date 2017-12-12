@@ -136,11 +136,31 @@ public class AwsUtil {
 
         ClientConfiguration config = new ClientConfiguration();
         config.setConnectionTimeout(250000);
-        config.setSocketTimeout(50000);     
-        AmazonS3Client s3Client = (AmazonS3Client) AmazonS3ClientBuilder.standard()
-                       .withCredentials(new EnvironmentVariableCredentialsProvider())
+        config.setSocketTimeout(50000);   
+        AmazonS3Client s3Client = null;
+        try{
+            EnvironmentVariableCredentialsProvider provider = new EnvironmentVariableCredentialsProvider();
+            if(null == provider.getCredentials()){
+                throw new Exception("Not credentials loaded!");
+            }
+            s3Client = (AmazonS3Client) AmazonS3ClientBuilder.standard()
+                       .withCredentials(provider)
                        .withRegion(Regions.US_EAST_1)
                        .build();
+        }
+        catch(Exception ex){
+            AWSCredentials credentials = getAwsCredentials();
+            s3Client = new AmazonS3Client(credentials, config);            
+            Region usEast = Region.getRegion(Regions.US_EAST_1);
+            s3Client.setRegion(usEast);
+        }
+        
+        if(null == s3Client){
+            AWSCredentials credentials = getAwsCredentials();
+            s3Client = new AmazonS3Client(credentials, config);            
+            Region usEast = Region.getRegion(Regions.US_EAST_1);
+            s3Client.setRegion(usEast);
+        }
         
         return s3Client;
     }

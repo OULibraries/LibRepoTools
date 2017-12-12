@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -147,7 +149,6 @@ public class DissertationProcessor {
                         dis.setFiles(files);
                         
                         dissertationList.add(dis);
-                        break;
                     }
                     
                 }
@@ -197,29 +198,28 @@ public class DissertationProcessor {
                     if(!dissertationContentsFile.exists()){
                         dissertationContentsFile.createNewFile();
                     }
-                    if(null == fw){
-                        fw = new FileWriter(dissertationContentsFile);
-                    }
-                    if(null == bw){
-                        bw = new BufferedWriter(fw);
-                    }
-                    if(null == out){
-                        out = new PrintWriter(bw);
-                    }
+                    fw = new FileWriter(dissertationContentsFile);
+                    bw = new BufferedWriter(fw);
+                    out = new PrintWriter(bw);
                     
                     for(String file : dis.getFiles()){
                         String fileName = getFileNameFromS3ObjectKey(file);
                         out.println(fileName);
                         S3Util.downloadS3ObjectToFile(s3Client, bucket, file, dissertationPath + File.separator + fileName);
                     }
+                    out.flush();
                 }
             }
         }
-        catch(IOException | IncompleteFunctionArgumentsException | InvalidS3ClientException ex){
+        catch(IOException ex){
             logger.error("Something is wrong when generating the saf package: " + ex.getMessage());
             ex.printStackTrace();
         } catch (InvalidS3ObjectKeyException ex) {
             logger.error("S3 object key is wrong: " + ex.getMessage());
+        } catch (InvalidS3ClientException ex) {
+            logger.error("Invalid S3 client is wrong: " + ex.getMessage());
+        } catch (IncompleteFunctionArgumentsException ex) {
+            logger.error(ex.getMessage());
         } finally {
             try{
                 if(null != out){
